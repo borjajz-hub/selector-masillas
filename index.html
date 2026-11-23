@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selector de masillas Roberlo</title>
+<meta name="theme-color" content="#1d2328">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Masillas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: formulario de preguntas a la izquierda, recomendación en vivo a la derecha (una columna en móvil) */
+  --bg:#eef0f1;
+  --panel:#ffffff;
+  --ink:#1d2328;
+  --muted:#5d6870;
+  --line:#d3d8dc;
+  --accent:#d9771b;      /* naranja masilla */
+  --accent-ink:#ffffff;
+  --accent-soft:#fbead9;
+  --chip:#f3f5f6;
+  --ok:#2f7d4f; --ok-soft:#e1f1e7;
+  --warn:#a8650b; --warn-soft:#fcf0dc;
+  --bad:#b23a32; --bad-soft:#f8e1df;
+  --display:"Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15191c; --panel:#1e2428; --ink:#e7ebee; --muted:#9aa5ad; --line:#333c42;
+    --accent:#f08d33; --accent-ink:#1a1208; --accent-soft:#3a2a1a; --chip:#262d32;
+    --ok:#6cc495; --ok-soft:#1c3327; --warn:#e7ad57; --warn-soft:#3a2d17; --bad:#ef8a82; --bad-soft:#3d2120;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15191c; --panel:#1e2428; --ink:#e7ebee; --muted:#9aa5ad; --line:#333c42;
+  --accent:#f08d33; --accent-ink:#1a1208; --accent-soft:#3a2a1a; --chip:#262d32;
+  --ok:#6cc495; --ok-soft:#1c3327; --warn:#e7ad57; --warn-soft:#3a2d17; --bad:#ef8a82; --bad-soft:#3d2120;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+header{padding:20px 24px 8px;max-width:1280px;margin:0 auto}
+h1{font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:.01em;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+main{max-width:1280px;margin:0 auto;padding:12px 24px 40px;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){main{grid-template-columns:1fr;padding:12px 16px 32px}header{padding:16px 16px 4px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+form.panel{padding:6px 18px 18px}
+fieldset{border:0;margin:0;padding:14px 0 12px;border-bottom:1px solid var(--line)}
+fieldset:last-of-type{border-bottom:0}
+legend{font-family:var(--display);font-weight:600;font-size:19px;padding:0;display:flex;gap:8px;align-items:baseline}
+legend .n{color:var(--accent);font-variant-numeric:tabular-nums}
+.hint{color:var(--muted);font-size:13px;margin:2px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips label{display:inline-block;padding:6px 11px;border:1px solid var(--line);background:var(--chip);border-radius:999px;cursor:pointer;font-size:14px;user-select:none}
+.chips label:hover{border-color:var(--accent)}
+.chips input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.chips input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+.results{display:flex;flex-direction:column;gap:16px}
+.banner{padding:12px 16px;border-radius:10px;border:1px solid;display:flex;gap:10px}
+.banner.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--ink)}
+.banner.warn{background:var(--warn-soft);border-color:var(--warn)}
+.banner b{color:inherit}
+.top{padding:20px 22px;border-left:6px solid var(--accent)}
+.eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.08em;font-size:14px;color:var(--accent);font-weight:600}
+.top h2{font-family:var(--display);font-size:40px;line-height:1.05;margin:2px 0 2px;font-weight:700}
+.top h2 small{font-size:20px;color:var(--muted);font-weight:500;margin-left:6px}
+.fam{color:var(--muted);margin:0 0 12px}
+.why{margin:0 0 14px;padding-left:18px}
+.why li{margin:2px 0}
+.why li.neg{color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:10px 0 16px}
+.stat{background:var(--chip);border-radius:8px;padding:10px 12px}
+.stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.stat .v{font-family:var(--display);font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .s{font-size:12px;color:var(--muted)}
+h3{font-family:var(--display);font-size:21px;margin:16px 0 6px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:500}
+td.hl,th.hl{background:var(--accent-soft);font-weight:600}
+.tbl{overflow-x:auto}
+ol.steps{padding-left:22px;margin:4px 0}
+ol.steps li{margin:4px 0}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line);margin:0 4px 4px 0}
+.pill.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.calc{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--chip);padding:10px 12px;border-radius:8px}
+.calc input{width:90px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-variant-numeric:tabular-nums}
+.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.calc output{font-family:var(--display);font-size:22px;font-weight:600}
+.alts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.alt{padding:14px 16px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.alt:hover{border-color:var(--accent)}
+.alt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.alt .nm{font-family:var(--display);font-size:24px;font-weight:600}
+.alt .sc{float:right;font-family:var(--display);font-size:16px;color:var(--muted)}
+.alt p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+details.panel{padding:12px 16px}
+details summary{cursor:pointer;font-family:var(--display);font-size:19px;font-weight:600}
+details ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+details li{margin:3px 0}
+details li span{color:var(--muted)}
+.foot{font-size:12px;color:var(--muted);margin-top:4px}
+.norm{padding:16px 18px}
+.norm ul{margin:6px 0 0;padding-left:18px}
+@media (prefers-reduced-motion:no-preference){.top{transition:border-color .2s}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Selector de masillas Roberlo</h1>
+  <p>Responde a las preguntas sobre la reparación y la recomendación se actualiza sola. Los datos salen de las fichas técnicas (TDS) de Roberlo; antes de aplicar, revisa siempre la ficha de seguridad y la etiqueta del envase.</p>
+</header>
+<main>
+<form class="panel" id="f" autocomplete="off"></form>
+<section class="results" id="out" aria-live="polite"></section>
+</main>
+
+<script>
+/* ---------- Datos de las TDS Roberlo ---------- */
+// sup: A acero · L aluminio · G galvanizado/electrozincado · P poliéster/fibra (SMC, UP-GFK) · O pintura OEM lijada · C cataforesis lijada · E fondo epoxi · F plástico flexible · R plástico rígido
+// roles 0-3: relleno, acabado, grande, oxido, refuerzo, rosca, plastico, pistola
+// apl/lij 1-3: facilidad de aplicación y de lijado según lo que dice cada ficha
+const P=[
+ {id:"multiextender",n:"MULTIEXTENDER",c:"A6",v:"220121",fam:"Multifuncional ligera",sup:"ALGPO",mix:"100:2-3",vm:[7,5,4],lt:[30,25,15],peq:"P120 → P220",gde:"P100 → P180 → P240",d:1.2,cov:25,r:{relleno:3,acabado:1,grande:1},apl:2,lij:3,nota:"Óptima adherencia sobre galvanizado y aluminio; se empieza a lijar con P120."},
+ {id:"total8",n:"TOTAL 8",c:"A38",v:"191114",fam:"Multifuncional ligera",sup:"ALGP",mix:"100:2-3",vm:[11,6,2],lt:[30,25,15],peq:"P120/150 → P220",gde:"P100 → P180 → P240",d:1.1,cov:25,r:{relleno:3,acabado:2,grande:2},apl:3,lij:3,nota:"Rellena y afina como una de acabado. Su cremosidad da tiempo de retoque en superficies grandes."},
+ {id:"vital",n:"VITAL",c:"A48",v:"160905",fam:"Multifuncional ligera sin estireno",sup:"ALGP",mix:"100:3",vm:[9,5,4],lt:[30,25,15],peq:"P120/150 → P220",gde:"P100 → P180 → P240",d:1.0,cov:24,r:{relleno:3,acabado:2,grande:2},apl:3,lij:2,sinEstireno:true,nota:"Sin estireno. Vida de mezcla larga para trabajar y retocar superficies grandes."},
+ {id:"racer1",n:"RACER 1",c:"A62",v:"250407",fam:"Ligera rápida",sup:"ALGP",mix:"100:2-3",vm:[6,4,2],lt:[25,15,8],peq:"P120/150 → P220",gde:"P100 → P180 → P240",d:1.2,cov:12,r:{relleno:3,acabado:2,grande:1},apl:3,lij:3,frio:true,nota:"Curado rápido, pensada para trabajar a bajas temperaturas. Textura fina."},
+ {id:"plus36",n:"PLUS 36",c:"A52",v:"160219",fam:"Poliéster multifuncional",sup:"ALP",mix:"100:2",vm:[7,5,4],lt:[30,20,15],peq:"P100-120 → P180-220",gde:"P80 → P150 → P240",d:1.9,cov:28,r:{relleno:3,acabado:2,grande:1},apl:3,lij:3,nota:"Fina: vale para rellenar y para acabar. Se lija a máquina o a mano. En aluminio, la ficha dice: «NO utilizar abrasivos superiores al P80»."},
+ {id:"plus30",n:"PLUS 30",c:"A44",v:"290520",fam:"Poliéster de relleno",sup:"ALGP",mix:"100:2",vm:[6.5,5,3.5],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P150 → P240",d:1.9,cov:35,r:{relleno:3,acabado:1,grande:1},apl:3,lij:2,calor:true,nota:"Tiempo abierto prolongado, adecuada para climas cálidos. Mucho poder de relleno."},
+ {id:"plus24",n:"PLUS 24",c:"A47",v:"150313",fam:"Poliéster de relleno",sup:"AP",mix:"100:2",vm:[6.5,5,3.5],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P150 → P240",d:1.9,cov:50,r:{relleno:3,acabado:0,grande:1},apl:2,lij:2,nota:"Solo acero y poliéster. Tiempo abierto prolongado."},
+ {id:"multi20",n:"MULTI 20",c:"A78",v:"260327",fam:"Poliéster universal",sup:"ALGP",mix:"100:2",vm:[10,5,2.5],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P150 → P240",d:1.7,cov:18,r:{relleno:3,acabado:1,grande:1},apl:3,lij:2,nota:"Muy cremosa y fina. Buena adherencia en varios metales."},
+ {id:"crystal",n:"CRYSTAL GLAZE",c:"A67",v:"191106",fam:"Glazing de acabado",sup:"ALGP",mix:"100:2",vm:[9,5,3],lt:[30,20,15],peq:"P180 → P240",gde:"P180 → P240",d:1.0,cov:3,r:{relleno:0,acabado:3,grande:0},apl:3,lij:3,nota:"Autonivelante: elimina poros y pequeñas imperfecciones con un lijado mínimo. Se puede mezclar con otros bodyfillers Roberlo."},
+ {id:"maxultra",n:"MAXILIGHT ULTRA",c:"A66",v:"210914",fam:"Bodyfiller ligero premium",sup:"ALGP",mix:"100:2-3",vm:[11,6,3],lt:[30,20,15],peq:"P150 → P180",gde:"P120 → P220",d:1.0,cov:8,r:{relleno:2,acabado:2,grande:3},apl:3,lij:3,prep:"Lijar con P40-60 (superficies grandes) o P80 (pequeñas) y degradar con P80.",nota:"Autonivelante y sin poros. No usar el «rayador de queso». Terminar la masilla con P120 y el contorno con P220."},
+ {id:"maxilight",n:"MAXILIGHT",c:"A25",v:"191106",fam:"Bodyfiller ligero",sup:"ALGP",mix:"100:2-3",vm:[13,7,4],lt:[30,20,15],peq:"P120 → P180",gde:"P80 → P180",d:1.0,cov:46,r:{relleno:3,acabado:0,grande:3},apl:3,lij:3,prep:"Lijar con P40-60 (superficies grandes) o P80 (pequeñas) y degradar con P80.",nota:"Para abolladuras, granizo y pequeñas cavidades. Terminar la masilla con P80 y el metal/contorno con P180."},
+ {id:"maxplus",n:"MAXILIGHT PLUS",c:"A18",v:"121212",fam:"Bodyfiller ligero",sup:"ALGP",mix:"100:2-3",vm:[8,6,3.5],lt:[30,20,15],peq:"P120 → P220",gde:"P100 → P180 → P240",d:1.1,cov:25,r:{relleno:2,acabado:0,grande:3},apl:3,lij:3,nota:"Cremosa, para grandes superficies. Envase grande."},
+ {id:"maxifill",n:"MAXIFILL",c:"A26",v:"121212",fam:"Bodyfiller ligero",sup:"ALGP",mix:"100:2-3",vm:[10,7,3],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P180",d:1.0,cov:25,r:{relleno:2,acabado:0,grande:3},apl:3,lij:3,prep:"Lijar P80 → P150 y limpiar con disolvente de limpieza.",nota:"Para grandes superficies; secado rápido."},
+ {id:"maxifillplus",n:"MAXIFILL PLUS",c:"A68",v:"210503",fam:"Bodyfiller ligero premium",sup:"ALGP",mix:"100:2-3",vm:[10,7,3],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P180",d:1.0,cov:27,r:{relleno:3,acabado:1,grande:3},apl:3,lij:3,nota:"La ficha destaca su «increíble facilidad de lijado». Acabado fino sin poros."},
+ {id:"silverlight",n:"SILVERLIGHT / PLUS",c:"A33",v:"130709",fam:"Bodyfiller ligero",sup:"ALGP",mix:"100:2-3",vm:[8,5,3],lt:[30,20,15],peq:"P120 → P220",gde:"P100 → P180 → P240",d:1.0,cov:16,r:{relleno:2,acabado:0,grande:3},apl:3,lij:3,nota:"Gris, sin tack, mucho relleno. Degradar el contorno con P180."},
+ {id:"multiplast",n:"MULTIPLAST",c:"A39",v:"140916",fam:"Masilla para plásticos",sup:"FRP",mix:"100:2-3",vm:[8,5,4],lt:[35,25,20],peq:"P180 → P240",gde:"P180 → P240",d:1.7,cov:41,r:{relleno:2,acabado:2,plastico:3},apl:3,lij:2,noIR:true,prep:"Rígido: DA93 → P150 → DA93. Flexible: DA93 → P180 → DA93.",nota:"Muy flexible, gris antracita, para parachoques. No sirve para encolar. Consejo de la ficha: calentar la pieza 1 h a 60 ºC antes de reparar."},
+ {id:"sn96",n:"SN96",c:"B1",v:"121212",fam:"Masilla metálica",sup:"A",mix:"100:2",vm:[6.5,5,3],lt:[20,10,6],peq:"P80 (rotativa a 800 rpm) → P150",gde:"P80 (rotativa a 800 rpm) → P150",d:1.5,cov:26,r:{relleno:1,oxido:3,rosca:3},apl:1,lij:1,combust:true,ir:"3 min · 80 cm · máx 80 ºC",aislaPol:true,nota:"Gran dureza. Para soldaduras, zonas oxidadas y roscados. Resiste gasolina, gasóleo y ácido de batería. Consejo: taladrar el contorno de la zona oxidada."},
+ {id:"aluminio",n:"ALUMINIO",c:"B2",v:"241205",fam:"Poliéster con pigmento metálico",sup:"AP",mix:"100:2",vm:[8,5,2],lt:[30,20,15],peq:"P120 → P220",gde:"P80 → P150 → P240",d:1.7,cov:24,r:{relleno:2,oxido:3},apl:2,lij:2,nota:"Más dureza, adherencia y resistencia que una masilla normal: muy adecuada para chapa oxidada. También para superficies metálicas que no se van a pintar."},
+ {id:"futura",n:"FUTURA GLASS",c:"B6",v:"121212",fam:"Ligera con fibra de vidrio",sup:"ALGP",mix:"100:3",vm:[7,5.5,4],lt:[30,20,15],peq:"P100–P150 → P180",gde:"P100–P150 → P180",d:1.2,cov:6,r:{relleno:2,acabado:1,oxido:2,refuerzo:2},apl:3,lij:3,nota:"Fibra flexible y fácil de espatular. Casi no deja poros, así que no hace falta repasarla con otra masilla."},
+ {id:"resinglass",n:"RESIN GLASS",c:"B7",v:"151026",fam:"Masilla con fibra",sup:"AP",mix:"100:2",vm:[7,5,3.5],lt:[30,20,15],peq:"P80 (rotativa a 800 rpm) → P150",gde:"P80 (rotativa a 800 rpm) → P150",d:1.6,cov:23,r:{relleno:2,oxido:3,refuerzo:3},apl:3,lij:1,aislaPol:true,nota:"Fibra para composites de poliéster y zonas metálicas oxidadas."},
+ {id:"vetroresina",n:"VETRORESINA",c:"B5",v:"121212",fam:"Resina para tejido de fibra",sup:"AP",mix:"100:2",vm:[19,13,6],lt:[30,20,15],peq:"P80 (rotativa a 800 rpm) → P150",gde:"P80 (rotativa a 800 rpm) → P150",d:1.1,cov:38,r:{oxido:2,refuerzo:3},apl:1,lij:1,nota:"Resina líquida que se aplica con tejido de fibra para reparar y reforzar. Antes de lijar, pasar un paño con disolvente para quitar el tack."},
+ {id:"a80",n:"A80",c:"C1",v:"220719",fam:"Masilla a pistola",sup:"ALOCE",mix:"100:5 vol · 100:3 peso (catalizador líquido)",vm:[null,25,null],lt:[null,180,null],peq:"P180 → P240",gde:"P180 → P240",d:1.5,cov:172,r:{relleno:1,grande:2,pistola:3},apl:2,lij:2,pistola:true,ir:"80 cm · 5-6 min",nota:"Mucho relleno, capas gruesas sin descolgar; adecuada para piezas de fundición. 2 manos ≈ 400 µm. No aplicar sobre termoplásticos ni sobre pinturas nitrosintéticas."}
+];
+
+/* ---------- Preguntas ---------- */
+const Q=[
+ {k:"sup",t:"¿Sobre qué material vas a aplicar?",h:"El material que queda debajo de la masilla después de preparar la zona.",o:[["A","Acero desnudo"],["G","Galvanizado / electrozincado"],["L","Aluminio"],["P","Poliéster / fibra (SMC, UP-GFK)"],["F","Plástico flexible (PP/EPDM, PUR, ABS, PA, PC)"],["O","Pintura original lijada"],["C","Cataforesis lijada"],["FU","Pieza de fundición"]],d:"A"},
+ {k:"dano",t:"¿Qué tipo de daño es?",o:[["relleno","Abolladura / golpe"],["acabado","Poros, rayas o acabado fino"],["grande","Superficie grande"],["oxido","Óxido o chapa picada"],["refuerzo","Perforado o roto (necesita refuerzo)"],["spotter","Tras desabollar con multifunción (spotter)"],["soldadura","Tras soldar chapa (costura o sustitución parcial)"],["rosca","Roscado o taladros"],["pistola","Irregularidades amplias (a pistola)"]],d:"relleno"},
+ {k:"prof",t:"¿Qué espesor de masilla necesitas?",h:"Las fichas Roberlo no fijan un espesor máximo para las masillas de espátula; esto orienta la elección entre acabado, relleno y fibra.",o:[["fino","Menos de 0,5 mm (velado)"],["medio","Hasta 2-3 mm"],["alto","Más de 3 mm"]],d:"medio"},
+ {k:"tam",t:"¿Qué tamaño tiene la reparación?",h:"Decide la secuencia de lijas de la ficha.",o:[["peq","Pequeña (menos que una mano)"],["gde","Grande (media pieza o más)"],["multi","Muchos parches pequeños (granizo, techo…)"]],d:"peq"},
+ {k:"temp",t:"¿A qué temperatura está el taller o la pieza?",o:[["lt5","Menos de 5 ºC"],["frio","5-15 ºC"],["normal","15-25 ºC"],["calor","Más de 25 ºC"]],d:"normal"},
+ {k:"corr",t:"¿Va a estar expuesta a agentes corrosivos?",o:[["no","Uso normal"],["hum","Humedad, sal o carretera de invierno"],["quim","Combustible o ácido de batería"]],d:"no"},
+ {k:"imp",t:"¿Vas a imprimar antes de enmasillar?",h:"Las fichas indican imprimación epoxi debajo cuando se necesita máxima protección. Nunca va masilla de poliéster sobre wash primer.",o:[["no","No, directo sobre el soporte"],["epoxi","Sí, con imprimación epoxi"],["rec","No lo sé, recomiéndame"]],d:"rec"},
+ {k:"met",t:"¿Cómo la vas a aplicar?",o:[["esp","Con espátula"],["pis","A pistola"],["ind","Me da igual"]],d:"esp"},
+ {k:"ir",t:"¿Cómo vas a secar?",o:[["aire","Al aire"],["ir","Con infrarrojos"]],d:"aire"},
+ {k:"pri",t:"¿Qué es lo que más te importa?",h:"Puedes marcar varias.",multi:true,o:[["apl","Fácil de aplicar"],["lij","Fácil de lijar"],["rap","Rapidez"],["lig","Poco peso"],["est","Sin estireno (menos olor)"],["cov","Lo más bajo en COV"]],d:["lij"]}
+];
+
+const f=document.getElementById("f");
+f.innerHTML=Q.map((q,i)=>`<fieldset><legend><span class="n">${String(i+1).padStart(2,"0")}</span>${q.t}</legend>${q.h?`<p class="hint">${q.h}</p>`:""}<div class="chips">${q.o.map(([v,l])=>{const id=`${q.k}-${v}`;const chk=q.multi?q.d.includes(v):q.d===v;return `<input type="${q.multi?"checkbox":"radio"}" name="${q.k}" id="${id}" value="${v}" ${chk?"checked":""}><label for="${id}">${l}</label>`}).join("")}</div></fieldset>`).join("");
+
+function state(){const s={};Q.forEach(q=>{if(q.multi)s[q.k]=[...f.querySelectorAll(`input[name=${q.k}]:checked`)].map(x=>x.value);else s[q.k]=(f.querySelector(`input[name=${q.k}]:checked`)||{}).value});return s}
+
+const supName={A:"acero",G:"galvanizado",L:"aluminio",P:"poliéster",F:"plástico flexible",O:"pintura original",C:"cataforesis",FU:"fundición",E:"epoxi"};
+const tIdx={frio:0,normal:1,calor:2,lt5:0};
+
+const POSTSOLD=["spotter","soldadura"];
+function needsEpoxi(s){return s.imp==="epoxi"||(s.imp==="rec"&&(s.corr==="hum"||POSTSOLD.includes(s.dano)))}
+
+// No aparecen en el catálogo de Roberlo España (comprobado el 23/11/2026)
+const NO_ES=["plus30","crystal","maxilight","maxplus","maxifill","maxifillplus","silverlight"];
+function evaluate(p,s){
+  const why=[],neg=[];let sc=0;
+  // soporte efectivo
+  let sup=s.sup==="FU"?"A":s.sup;
+  const epoxi=needsEpoxi(s)&&!["F"].includes(s.sup);
+  let okSup=p.sup.includes(sup)||(sup==="F"&&p.sup.includes("F"));
+  if(!okSup&&epoxi&&!p.sup.includes("F")&&p.id!=="sn96"){okSup=true;why.push("Sobre la imprimación epoxi la ficha la admite.")}
+  if(!okSup&&epoxi&&p.sup.includes("E"))okSup=true;
+  if(!okSup)return{out:`la ficha no la contempla sobre ${supName[s.sup]}`};
+  if(s.sup==="F"&&p.id!=="multiplast")return{out:"no es para plásticos"};
+  if(p.id==="multiplast"&&!["F","P"].includes(s.sup))return{out:"es solo para plásticos y poliéster"};
+  // método
+  if(s.met==="esp"&&p.pistola)return{out:"se aplica a pistola"};
+  if(s.met==="pis"&&!p.pistola)return{out:"se aplica con espátula"};
+  // daño
+  let role;
+  if(s.sup==="F")role=p.r.plastico||0;
+  else if(s.dano==="spotter")role=p.r.relleno||0;
+  else if(s.dano==="soldadura")role=p.id==="sn96"?3:((p.r.relleno||0)>=3?1:0);
+  else role=p.r[s.dano]||0;
+  if(POSTSOLD.includes(s.dano)&&(p.pistola||p.id==="vetroresina"))role=0;
+  if(s.dano==="pistola"&&!p.pistola&&s.met!=="pis"){role=p.r.grande?1:0}
+  if(role===0)return{out:"no está indicada para este tipo de daño"};
+  sc+=role*12;
+  if(role===3)why.push(`Indicada en ficha para ${({relleno:"rellenar golpes",acabado:"acabado fino y poros",grande:"superficies grandes",oxido:"chapa oxidada",refuerzo:"reparar y reforzar zonas rotas",rosca:"roscados y taladros",spotter:"rellenar golpes",soldadura:"sellar zonas reparadas con soldadura",pistola:"nivelar irregularidades a pistola"})[s.sup==="F"?"relleno":s.dano]||"este daño"}.`);
+  if(s.sup==="F")why.push("Es la única masilla de la gama para plásticos flexibles.");
+  if(s.dano==="spotter"&&role>=3&&(p.sup.includes("G")||p.id==="multiextender")){sc+=3}
+  if(s.dano==="spotter"&&p.id==="multiextender"){sc+=4;why.push("Adherencia óptima sobre galvanizado, útil en el borde de la zona desabollada.")}
+  if(s.dano==="soldadura"&&p.id!=="sn96")neg.push("Sobre el cordón de soldadura, la ficha que lo contempla es la de SN96; esta sirve para la capa de poliéster encima.");
+  if(s.sup==="FU"&&p.id==="a80"){sc+=12;why.push("La ficha la recomienda para recubrir piezas de fundición.")}
+  // espesor
+  if(s.prof==="fino"){sc+=(p.r.acabado||0)*5;if(p.r.acabado>=2)why.push("Acabado fino, apta para velar.");if(!p.r.acabado)neg.push("Para menos de 0,5 mm es mejor una de acabado.")}
+  if(s.prof==="alto"){sc+=((p.r.relleno||0)+(p.r.refuerzo||0))*3;if(p.d<=1.2&&p.r.grande>=2)sc+=3;if(p.r.acabado===3&&!p.r.relleno){sc-=20;neg.push("Las de acabado no son para espesores altos.")}}
+  // tamaño
+  if(s.tam==="gde"){sc+=(p.r.grande||0)*4;if(p.r.grande===3)why.push("Pensada para grandes superficies.")}
+  if(s.tam==="multi"){
+    sc+=p.lij*4+p.apl*3+(p.r.grande||0)*2;
+    if(p.lij===3)why.push("Se lija fácil, y eso cuenta mucho cuando hay que repasar muchos parches.");
+    if(p.d<=1.2){sc+=4;why.push("Ligera: rellena muchos parches sin cargar de peso la pieza.")}
+    const v=p.vm[tIdx[s.temp]];
+    if(v!=null&&v>=6){sc+=4;why.push(`Vida de la mezcla de ${String(v).replace(".",",")}': da tiempo a cubrir varios parches con una sola mezcla.`)}
+    if(v!=null&&v<=3){sc-=6;neg.push(`Solo ${String(v).replace(".",",")}' de vida de la mezcla: tendrás que hacer muchas mezclas pequeñas.`)}
+    if(p.lij===1){sc-=6}
+  }
+  // temperatura
+  const ti=tIdx[s.temp];
+  if(s.temp==="frio"){if(p.frio){sc+=15;why.push("Curado rápido para bajas temperaturas.")}if(p.lt[0]&&p.lt[0]>=35)neg.push(`A 10 ºC tarda ${p.lt[0]}' en poder lijarse.`)}
+  if(s.temp==="calor"){if(p.calor){sc+=10;why.push("Tiempo abierto prolongado, indicada para climas cálidos.")}
+    const v=p.vm[2];if(v!=null){if(v>=4)sc+=4;if(v<=2.5){sc-=8;neg.push(`A 30 ºC solo tienes ${String(v).replace(".",",")}' de vida de mezcla.`)}}}
+  // corrosión
+  if(s.corr==="quim"){if(p.combust){sc+=25;why.push("Según su ficha, es la única que resiste combustible y ácido de batería.")}else neg.push("La ficha no indica resistencia a combustibles ni a ácidos.")}
+  if(s.corr==="hum"&&p.r.oxido>=2){sc+=4}
+  // secado
+  if(s.ir==="ir"&&p.noIR){sc-=3;neg.push("La ficha no da datos de secado IR.")}
+  // prioridades
+  const pr=s.pri||[];
+  if(pr.includes("apl")){sc+=p.apl*4;if(p.apl===3)why.push("La ficha destaca su facilidad de aplicación o cremosidad.");if(p.apl===1)neg.push("Aplicación más laboriosa.")}
+  if(pr.includes("lij")){sc+=p.lij*4;if(p.lij===3&&s.tam!=="multi")why.push("La ficha destaca su facilidad de lijado.");if(p.lij===1)neg.push("Cuesta más de lijar (dura o con fibra).")}
+  if(pr.includes("rap")){const t=p.lt[1];if(t!=null){sc+=Math.max(0,(25-t))*0.8;if(t<=15)why.push(`Se lija a los ${t}' a 20 ºC.`)}}
+  if(pr.includes("lig")){if(p.d<=1.2){sc+=6;why.push(`Ligera: ${String(p.d).replace(".",",")} kg/l.`)}else neg.push(`Pesada: ${String(p.d).replace(".",",")} kg/l.`)}
+  if(pr.includes("est")){if(p.sinEstireno){sc+=18;why.push("Sin estireno.")}else neg.push("Lleva estireno.")}
+  if(pr.includes("cov")){if(p.cov<=10){sc+=6;why.push(`COV muy bajo: ${p.cov} g/l.`)}else if(p.cov<=20)sc+=3}
+  return{sc,why,neg};
+}
+
+function fmt(n){return n==null?"—":String(n).replace(".",",")+"'"}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let pick=null;
+function render(){
+  const s=state();
+  const ev=P.filter(p=>!NO_ES.includes(p.id)).map(p=>({p,...evaluate(p,s)}));
+  const ok=ev.filter(e=>e.out==null).sort((a,b)=>b.sc-a.sc);
+  const out=ev.filter(e=>e.out!=null);
+  const O=document.getElementById("out");
+  let h="";
+  if(s.temp==="lt5")h+=`<div class="banner bad"><div><b>Por debajo de +5 ºC las masillas de poliéster no endurecen</b> (lo dicen todas las fichas). Calienta la cabina o la pieza antes de enmasillar. Las recomendaciones de abajo valen solo cuando estés por encima de 5 ºC.</div></div>`;
+  if(!ok.length){h+=`<div class="banner warn"><div><b>Ninguna masilla de la gama encaja con esta combinación.</b> Prueba a imprimar con epoxi o a cambiar el método de aplicación. Estas son las razones:<ul>${out.slice(0,6).map(e=>`<li>${e.p.n}: ${e.out}</li>`).join("")}</ul></div></div>`;O.innerHTML=h;return}
+  const top=ok.find(e=>e.p.id===pick)||ok[0];
+  const p=top.p;const ti=s.temp==="lt5"?0:tIdx[s.temp];
+  const epoxi=needsEpoxi(s)&&s.sup!=="F";
+  const lij=s.tam==="gde"?p.gde:p.peq;
+  const vmNow=p.vm[ti]??p.vm[1];
+  // pasos
+  const steps=[];
+  if(p.id==="multiplast")steps.push("Opcional, según la ficha: calentar la pieza 1 h a 60 ºC para que salga el desmoldeante.");
+  steps.push(p.prep?esc(p.prep):(p.pistola?"Lijar el soporte con P240 y desengrasar con DA93.":"Lijar el soporte P80 → P150 y desengrasar con DA93."));
+  if(s.dano==="spotter")steps.unshift("Antes de enmasillar (buena práctica de taller, no viene en la TDS): cortar y amolar a ras los pernos, arandelas o puntos del spotter y eliminar la zona quemada y el zinc dañado hasta dejar metal limpio.");
+  if(s.dano==="soldadura")steps.unshift("Antes de enmasillar (buena práctica de taller, no viene en la TDS): amolar el cordón a ras, quitar la cascarilla y la zona quemada, y comprobar que no queden poros en la soldadura.");
+  if(s.sup==="O"||s.sup==="C")steps.push("Asegúrate de que la pintura o cataforesis esté bien adherida y lijada.");
+  if(epoxi)steps.push("Aplicar <b>imprimación epoxi</b> y dejarla secar del todo antes de enmasillar. Nunca uses wash primer debajo.");
+  if(p.pistola){steps.push("Catalizar con catalizador líquido para poliéster: <b>100:5 en volumen</b> o 100:3 en peso. No hace falta diluir; si acaso, como máximo un 5 % de diluyente de poliéster.");steps.push("Pistola convencional 2,0-2,5 mm a 3 bar y 15-20 cm, o HVLP 2,0-2,5 mm a 2 bar y 10 cm. 2 manos con 5' entre manos a 20 ºC.");steps.push("Secado: a 20 ºC, 3 h hasta poder lijar; a 60 ºC, 25'; con IR a 80 cm, 5-6'.")}
+  else{steps.push(`Catalizar con PBO a <b>${p.mix}</b> en peso. No te pases de catalizador y mézclalo perfectamente.`);
+    if(p.id==="vetroresina")steps.push("Impregnar el tejido de fibra de vidrio con la resina.");
+    else if(s.tam==="multi")steps.push(`Con muchos parches, mezcla solo la masilla que puedas aplicar en ${fmt(vmNow)} y trabaja por zonas. Aprieta la primera capa en cada parche y no extiendas masilla entre abolladuras para no tener que lijarla después.`);
+    else steps.push("Aplicar apretando la primera capa sobre el soporte y cargar en capas sucesivas. Elige una espátula adecuada al tamaño y la forma de la zona.");
+    steps.push(s.ir==="ir"&&!p.noIR?`Secado IR: ${p.ir||"5 min · lámpara a 80 cm · máx 80 ºC"}.`:`Esperar ${fmt(p.lt[ti])} antes de lijar (a ${["10","20","30"][ti]} ºC).`)}
+  if(p.id==="vetroresina")steps.push("Pasar un paño con disolvente para quitar el tack antes de lijar.");
+  steps.push(`Lijar <b>en seco</b>: ${lij}.${s.tam==="multi"?" En un techo, usa taco o garlopa para no dejar ondas entre parches y revisa la superficie con luz rasante.":""}`);
+  if(p.aislaPol){const pol=ok.find(e=>!e.p.aislaPol&&!e.p.pistola&&e.p.r.relleno>=3);steps.push(`<b>Aislarla con una masilla de poliéster</b> antes del fondo, como pide la ficha${pol?` (por ejemplo, ${pol.p.n})`:""}.`)}
+  steps.push(p.pistola?"Aislar con un aparejo adecuado antes del acabado para evitar el blistering.":"Aislar con aparejo antes del acabado.");
+  const pills=[];
+  pills.push(`<span class="pill ok">Ficha TDS ${p.c} · v.${p.v}</span>`);
+  if(epoxi)pills.push(`<span class="pill warn">Con imprimación epoxi</span>`);
+  if(p.sinEstireno)pills.push(`<span class="pill">Sin estireno</span>`);
+  if(p.combust)pills.push(`<span class="pill">Resiste combustibles</span>`);
+
+  h+=`<article class="panel top">
+   <div class="eyebrow">${top===ok[0]?"Recomendada":"Alternativa seleccionada"}</div>
+   <h2>${p.n}<small>${p.c}</small></h2>
+   <p class="fam">${p.fam}. ${esc(p.nota)}</p>
+   <div>${pills.join("")}</div>
+   <ul class="why">${top.why.map(w=>`<li>${esc(w)}</li>`).join("")}${top.neg.map(w=>`<li class="neg">${esc(w)}</li>`).join("")}</ul>
+   <div class="stats">
+    <div class="stat"><div class="k">Mezcla</div><div class="v">${p.pistola?"100:5":p.mix}</div><div class="s">${p.pistola?"en volumen, catalizador líquido":"en peso, con catalizador PBO"}</div></div>
+    <div class="stat"><div class="k">Vida de la mezcla</div><div class="v">${fmt(p.vm[ti]??p.vm[1])}</div><div class="s">a ${p.vm[ti]!=null?["10","20","30"][ti]:"20"} ºC</div></div>
+    <div class="stat"><div class="k">Lijar a los</div><div class="v">${p.pistola?"3 h":fmt(p.lt[ti])}</div><div class="s">${p.pistola?"a 20 ºC":`a ${["10","20","30"][ti]} ºC`}${s.ir==="ir"&&!p.noIR?" · IR "+(p.ir||"5 min"):""}</div></div>
+    <div class="stat"><div class="k">Peso específico</div><div class="v">${String(p.d).replace(".",",")}</div><div class="s">kg/l a 20 ºC</div></div>
+   </div>
+   ${p.pistola?"":`<div class="calc"><label for="g">Masilla que vas a usar</label><input id="g" type="number" min="1" step="1" value="100" inputmode="numeric"> g <span aria-hidden="true">→</span> PBO: <output id="cat"></output></div>`}
+   ${p.pistola?"":`<h3>Tiempos según temperatura</h3><div class="tbl"><table><thead><tr><th></th>${["10 ºC","20 ºC","30 ºC"].map((t,i)=>`<th class="${i===ti?"hl":""}">${t}</th>`).join("")}</tr></thead><tbody><tr><td>Vida de la mezcla</td>${p.vm.map((v,i)=>`<td class="${i===ti?"hl":""}">${fmt(v)}</td>`).join("")}</tr><tr><td>Lijar a los</td>${p.lt.map((v,i)=>`<td class="${i===ti?"hl":""}">${fmt(v)}</td>`).join("")}</tr></tbody></table></div>`}
+   <h3>Proceso</h3><ol class="steps">${steps.map(x=>`<li>${x}</li>`).join("")}</ol>
+  </article>`;
+
+  const alts=ok.filter(e=>e!==top).slice(0,3);
+  if(alts.length)h+=`<div><h3 style="margin-top:0">Otras opciones</h3><div class="alts">${alts.map(e=>`<button type="button" class="panel alt" data-id="${e.p.id}"><span class="sc">${e===ok[0]?"Recomendada":"#"+(ok.indexOf(e)+1)}</span><div class="nm">${e.p.n}</div><p>${e.p.fam}. ${esc((e.why[0]||e.p.nota))}</p></button>`).join("")}</div></div>`;
+
+  // normativa
+  h+=`<section class="panel norm"><h3 style="margin-top:0">Normativa y seguridad</h3><ul>
+   <li>COV de la mezcla: <b>${p.cov} g/l</b>. El límite para masillas (Directiva 2004/42/CE, categoría IIB(b), RD 227/2006) es de 250 g/l: ${p.cov<=250?"cumple":"NO cumple"}.</li>
+   <li>Solo para uso profesional. Antes de usarla, consulta la ficha de seguridad (SDS) y la etiqueta, y gestiona los residuos según la normativa.</li>
+   <li>Buenas prácticas de taller, no sacadas de la TDS: guantes de nitrilo al mezclar, y para lijar, aspiración y mascarilla para partículas.</li>
+   <li>Almacenar entre +5 y +30 ºC, sin sol directo. Garantía: 1 año en el envase original sin abrir.</li></ul></section>`;
+
+  if(out.length)h+=`<details class="panel"><summary>Descartadas (${out.length})</summary><ul>${out.map(e=>`<li><b>${e.p.n}</b> <span>— ${e.out}</span></li>`).join("")}</ul></details>`;
+  h+=`<p class="foot">Fuente: fichas técnicas Roberlo en español, descargadas de roberlo.com el 23/11/2026. Solo se recomiendan las 15 masillas con TDS que salen en el catálogo de Roberlo España (Halley UV20, la 16.ª, no tiene TDS publicada). La facilidad de aplicación y de lijado se valora con lo que dice cada ficha.</p>`;
+  O.innerHTML=h;
+
+  const g=document.getElementById("g");
+  if(g){const upd=()=>{const m=parseFloat(g.value)||0;const r=p.mix.match(/100:(\d+)(?:-(\d+))?/);const a=r?+r[1]:2,b=r&&r[2]?+r[2]:a;const t=x=>(m*x/100).toLocaleString("es-ES",{maximumFractionDigits:1});document.getElementById("cat").textContent=a===b?`${t(a)} g`:`${t(a)}–${t(b)} g`};g.addEventListener("input",upd);upd()}
+  O.querySelectorAll(".alt").forEach(b=>b.addEventListener("click",()=>{pick=b.dataset.id;render();O.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})}));
+}
+f.addEventListener("change",()=>{pick=null;render()});
+f.addEventListener("submit",e=>e.preventDefault());
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
