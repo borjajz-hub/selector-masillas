@@ -1,7 +1,7 @@
 {
-  "name": "Selector de masillas Roberlo",
+  "name": "Selector de masillas",
   "short_name": "Masillas",
-  "description": "Elige la masilla Roberlo adecuada según las fichas técnicas.",
+  "description": "Elige la masilla adecuada (Roberlo, SINNEK, 3B) según las fichas técnicas.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",
